@@ -85,7 +85,7 @@ export default function CTA() {
           </motion.button>
 
           <motion.a
-            href={`https://wa.me/${SITE_CONFIG.whatsapp}?text=Bonjour, je voudrais prendre rendez-vous`}
+            href={`https://wa.me/${SITE_CONFIG.whatsapp}?text=Bonjour%2C%20je%20voudrais%20prendre%20rendez-vous%20au%20Centre%20d%27Optique%20A%C3%AFt%20Ourir`}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.04 }}

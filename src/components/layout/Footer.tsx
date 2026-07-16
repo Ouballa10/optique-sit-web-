@@ -11,6 +11,7 @@ import {
   ArrowRight,
   Heart,
 } from "lucide-react";
+import { SITE_CONFIG } from "@/lib/data";
 
 function InstagramIcon({ size = 17 }: { size?: number }) {
   return (
@@ -27,7 +28,14 @@ function FacebookIcon({ size = 17 }: { size?: number }) {
     </svg>
   );
 }
-import { SITE_CONFIG } from "@/lib/data";
+
+function TikTokIcon({ size = 17 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
+    </svg>
+  );
+}
 
 const QUICK_LINKS = [
   { label: "Accueil", href: "#hero" },
@@ -117,12 +125,14 @@ export default function Footer() {
               Votre centre d&apos;optique premium à Aït Ourir. Expertise, qualité
               et service depuis plus de 10 ans.
             </p>
+            {/* Social links */}
             <div className="flex items-center gap-3">
               <a
                 href={SITE_CONFIG.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white/5 hover:bg-[#B40000] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+                aria-label="Instagram"
+                className="w-10 h-10 bg-white/5 hover:bg-gradient-to-br hover:from-[#833ab4] hover:via-[#fd1d1d] hover:to-[#fcb045] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
                 <InstagramIcon size={17} />
               </a>
@@ -130,14 +140,25 @@ export default function Footer() {
                 href={SITE_CONFIG.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white/5 hover:bg-[#B40000] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+                aria-label="Facebook"
+                className="w-10 h-10 bg-white/5 hover:bg-[#1877F2] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
                 <FacebookIcon size={17} />
+              </a>
+              <a
+                href={SITE_CONFIG.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                className="w-10 h-10 bg-white/5 hover:bg-[#010101] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 border border-transparent hover:border-white/10"
+              >
+                <TikTokIcon size={17} />
               </a>
               <a
                 href={`https://wa.me/${SITE_CONFIG.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="WhatsApp"
                 className="w-10 h-10 bg-white/5 hover:bg-[#25D366] rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
                 <MessageCircle size={17} />
@@ -197,36 +218,47 @@ export default function Footer() {
               Contact
             </h4>
             <ul className="space-y-4">
+              {/* Address */}
               <li className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-[#B40000]/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                   <MapPin size={14} className="text-[#B40000]" />
                 </div>
-                <span className="text-white/50 text-sm leading-relaxed">
-                  {SITE_CONFIG.address}
-                </span>
+                <div className="text-sm leading-relaxed">
+                  <div className="text-white/70 font-medium" dir="rtl">
+                    {SITE_CONFIG.address}
+                  </div>
+                  <div className="text-white/40 text-xs mt-0.5">
+                    {SITE_CONFIG.addressFr}
+                  </div>
+                </div>
               </li>
+              {/* Phone */}
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-[#B40000]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Phone size={14} className="text-[#B40000]" />
                 </div>
                 <a
-                  href={`tel:${SITE_CONFIG.phone}`}
+                  href={`tel:+212606708444`}
                   className="text-white/50 hover:text-white text-sm transition-colors"
                 >
                   {SITE_CONFIG.phone}
                 </a>
               </li>
+              {/* WhatsApp */}
               <li className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#B40000]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Mail size={14} className="text-[#B40000]" />
+                <div className="w-8 h-8 bg-[#25D366]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <MessageCircle size={14} className="text-[#25D366]" />
                 </div>
                 <a
-                  href={`mailto:${SITE_CONFIG.email}`}
-                  className="text-white/50 hover:text-white text-sm transition-colors"
+                  href={`https://wa.me/${SITE_CONFIG.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/50 hover:text-[#25D366] text-sm transition-colors"
                 >
-                  {SITE_CONFIG.email}
+                  WhatsApp · {SITE_CONFIG.phone}
                 </a>
               </li>
+              {/* Hours */}
               <li className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-[#B40000]/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Clock size={14} className="text-[#B40000]" />
@@ -248,8 +280,7 @@ export default function Footer() {
       <div className="border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-white/30 text-xs">
-            © {new Date().getFullYear()} Centre d&apos;Optique Aït Ourir. Tous
-            droits réservés.
+            © {new Date().getFullYear()} Centre d&apos;Optique Aït Ourir. Tous droits réservés.
           </p>
           <p className="text-white/30 text-xs flex items-center gap-1.5">
             Fait avec <Heart size={11} className="text-[#B40000] fill-[#B40000]" /> à Aït Ourir, Maroc

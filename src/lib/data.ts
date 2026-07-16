@@ -5,14 +5,16 @@ export const SITE_CONFIG = {
   description:
     "Centre d'optique premium à Aït Ourir, Marrakech. Examen de la vue, lunettes de prescription, lunettes de soleil, lentilles de contact et montures de marques internationales.",
   url: "https://optiqueaitourir.ma",
-  phone: "+212 6 00 00 00 00",
-  whatsapp: "+212600000000",
+  phone: "+212 6 06 70 84 44",
+  whatsapp: "212606708444",
   email: "contact@optiqueaitourir.ma",
-  address: "Avenue Mohammed V, Aït Ourir, Marrakech-Safi, Maroc",
+  address: "السوق الجديد العمران، قرب باشوية أيت أورير، أيت أورير، مراكش",
+  addressFr: "Souk Jadid Al Omrane, près de la Caïdat, Aït Ourir, Marrakech",
   mapUrl:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3394.5!2d-7.65!3d31.56!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzHCsDMzJzM2LjAiTiA3wrAzOScwMC4wIlc!5e0!3m2!1sfr!2sma!4v1000000000000",
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3394.0!2d-7.6583!3d31.5618!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzHCsDMzJzQyLjUiTiA3wrAzOSczMC4wIlc!5e0!3m2!1sfr!2sma!4v1700000000000",
   instagram: "https://www.instagram.com/centredoptiqueaitourir",
-  facebook: "https://www.facebook.com/centredoptiqueaitourir",
+  facebook: "https://www.facebook.com/profile.php?id=61588240704589",
+  tiktok: "https://www.tiktok.com/@centre_optique_ait_ourir",
   hours: {
     weekdays: "09:00 – 13:00 / 15:00 – 20:00",
     saturday: "09:00 – 20:00",

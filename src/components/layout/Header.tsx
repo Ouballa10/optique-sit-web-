@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -53,7 +52,10 @@ export default function Header() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setActiveDropdown(null);
       }
     };
@@ -65,10 +67,32 @@ export default function Header() {
     setIsMenuOpen(false);
     setActiveDropdown(null);
     const el = document.querySelector(href);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  // ─── colour logic ──────────────────────────────────────────────
+  // On hero (not scrolled) → always white text (image behind)
+  // Scrolled → white on dark-mode, dark on light-mode
+  const isDark = theme === "dark";
+
+  const textColor = isScrolled
+    ? isDark
+      ? "text-white"
+      : "text-[#111]"
+    : "text-white";               // hero always white
+
+  const hoverBg = isScrolled
+    ? isDark
+      ? "hover:bg-white/10"
+      : "hover:bg-black/6"
+    : "hover:bg-white/10";
+
+  const scrolledBg = isScrolled
+    ? isDark
+      ? "bg-[#0d0d0d]/90 backdrop-blur-xl border-b border-white/8"
+      : "bg-white/90 backdrop-blur-xl border-b border-black/6 shadow-sm"
+    : "bg-transparent";
+  // ──────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -77,15 +101,15 @@ export default function Header() {
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-          isScrolled
-            ? "glass-card shadow-luxury border-b border-white/20 dark:border-white/5 py-3"
-            : "bg-transparent py-5"
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-400",
+          scrolledBg,
+          isScrolled ? "py-3" : "py-5"
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            {/* Logo */}
+
+            {/* ── Logo ── */}
             <motion.button
               onClick={() => scrollTo("#hero")}
               className="flex items-center gap-3 group"
@@ -94,20 +118,23 @@ export default function Header() {
             >
               <div className="relative w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-red group-hover:scale-110 transition-transform duration-300">
                 <Eye size={20} className="text-white" />
-                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#D4AF37] rounded-full"></div>
+                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#D4AF37] rounded-full" />
               </div>
-              <div className={cn("transition-colors duration-300", isScrolled ? "text-[#111]  dark:text-white" : "text-white")}>
+              <div className={cn("transition-colors duration-300", textColor)}>
                 <div className="font-display font-bold text-lg leading-none">
                   Aït Ourir
                 </div>
-                <div className="text-xs tracking-[0.2em] uppercase opacity-70 font-sans">
+                <div className="text-xs tracking-[0.2em] uppercase opacity-60 font-sans">
                   Optique
                 </div>
               </div>
             </motion.button>
 
-            {/* Desktop Nav */}
-            <nav ref={dropdownRef} className="hidden lg:flex items-center gap-1">
+            {/* ── Desktop Nav ── */}
+            <nav
+              ref={dropdownRef}
+              className="hidden lg:flex items-center gap-0.5"
+            >
               {NAV_ITEMS.map((item) => (
                 <div key={item.label} className="relative">
                   {item.children ? (
@@ -119,9 +146,8 @@ export default function Header() {
                       }
                       className={cn(
                         "flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                        isScrolled
-                          ? "text-[#111] dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-                          : "text-white/90 hover:text-white hover:bg-white/10"
+                        textColor,
+                        hoverBg
                       )}
                     >
                       {item.label}
@@ -138,30 +164,40 @@ export default function Header() {
                       onClick={() => scrollTo(item.href)}
                       className={cn(
                         "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                        isScrolled
-                          ? "text-[#111] dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-                          : "text-white/90 hover:text-white hover:bg-white/10"
+                        textColor,
+                        hoverBg
                       )}
                     >
                       {item.label}
                     </button>
                   )}
 
-                  {/* Dropdown */}
+                  {/* Dropdown panel */}
                   <AnimatePresence>
                     {item.children && activeDropdown === item.label && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        initial={{ opacity: 0, y: 10, scale: 0.96 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 mt-2 w-56 glass-card rounded-2xl shadow-luxury-lg border border-white/20 dark:border-white/10 overflow-hidden"
+                        exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                        transition={{ duration: 0.18 }}
+                        className={cn(
+                          "absolute top-full left-0 mt-2 w-56 rounded-2xl shadow-luxury-lg overflow-hidden z-50",
+                          "border",
+                          isDark
+                            ? "bg-[#111] border-white/10"
+                            : "bg-white border-gray-100"
+                        )}
                       >
                         {item.children.map((child) => (
                           <button
                             key={child.label}
                             onClick={() => scrollTo(child.href)}
-                            className="w-full text-left px-5 py-3 text-sm text-[#111] dark:text-white hover:bg-[#B40000]/5 dark:hover:bg-[#B40000]/10 hover:text-[#B40000] transition-colors duration-150"
+                            className={cn(
+                              "w-full text-left px-5 py-3 text-sm transition-colors duration-150 hover:text-[#B40000]",
+                              isDark
+                                ? "text-white/80 hover:bg-white/5"
+                                : "text-[#111] hover:bg-[#B40000]/5"
+                            )}
                           >
                             {child.label}
                           </button>
@@ -173,8 +209,9 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Right Actions */}
-            <div className="flex items-center gap-2">
+            {/* ── Right Actions ── */}
+            <div className="flex items-center gap-1.5">
+
               {/* Search */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -182,44 +219,42 @@ export default function Header() {
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className={cn(
                   "p-2.5 rounded-xl transition-all duration-200",
-                  isScrolled
-                    ? "text-[#111] dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-                    : "text-white hover:bg-white/10"
+                  textColor,
+                  hoverBg
                 )}
               >
                 <Search size={18} />
               </motion.button>
 
-              {/* Theme Toggle */}
+              {/* Theme toggle */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
                 className={cn(
                   "p-2.5 rounded-xl transition-all duration-200",
-                  isScrolled
-                    ? "text-[#111] dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-                    : "text-white hover:bg-white/10"
+                  textColor,
+                  hoverBg
                 )}
+                aria-label="Changer le thème"
               >
-                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
               </motion.button>
 
-              {/* Phone - desktop */}
+              {/* Phone */}
               <a
-                href={`tel:${SITE_CONFIG.phone}`}
+                href="tel:+212606708444"
                 className={cn(
-                  "hidden md:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-                  isScrolled
-                    ? "text-[#111] dark:text-white hover:bg-black/5 dark:hover:bg-white/10"
-                    : "text-white hover:bg-white/10"
+                  "hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                  textColor,
+                  hoverBg
                 )}
               >
                 <Phone size={15} />
                 <span className="hidden xl:block">{SITE_CONFIG.phone}</span>
               </a>
 
-              {/* CTA Button */}
+              {/* Rendez-vous CTA */}
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -229,17 +264,17 @@ export default function Header() {
                 Rendez-vous
               </motion.button>
 
-              {/* Mobile Menu Toggle */}
+              {/* Mobile hamburger */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={cn(
-                  "lg:hidden p-2.5 rounded-xl",
-                  isScrolled
-                    ? "text-[#111] dark:text-white"
-                    : "text-white"
+                  "lg:hidden p-2.5 rounded-xl transition-colors duration-200",
+                  textColor,
+                  hoverBg
                 )}
+                aria-label="Menu"
               >
                 {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </motion.button>
@@ -247,27 +282,35 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* ── Search bar ── */}
         <AnimatePresence>
           {isSearchOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden border-t border-white/10"
+              transition={{ duration: 0.25 }}
+              className={cn(
+                "overflow-hidden border-t",
+                isDark ? "border-white/8" : "border-black/6"
+              )}
             >
               <div className="max-w-7xl mx-auto px-4 py-3">
                 <div className="relative">
                   <Search
-                    size={18}
+                    size={17}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                   />
                   <input
                     type="text"
-                    placeholder="Rechercher lunettes, marques, services..."
+                    placeholder="Rechercher lunettes, marques, services…"
                     autoFocus
-                    className="w-full pl-11 pr-4 py-3 bg-white/10 dark:bg-black/20 backdrop-blur rounded-xl border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-[#B40000] transition-colors"
+                    className={cn(
+                      "w-full pl-11 pr-4 py-3 rounded-xl border text-sm focus:outline-none focus:border-[#B40000] transition-colors",
+                      isDark
+                        ? "bg-white/8 border-white/12 text-white placeholder-white/40"
+                        : "bg-black/5 border-black/10 text-[#111] placeholder-gray-400"
+                    )}
                   />
                 </div>
               </div>
@@ -276,51 +319,86 @@ export default function Header() {
         </AnimatePresence>
       </motion.header>
 
-      {/* Mobile Menu */}
+      {/* ══ Mobile side drawer ══ */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 lg:hidden"
           >
-            <div
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setIsMenuOpen(false)}
             />
-            <motion.div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white dark:bg-[#0a0a0a] shadow-2xl flex flex-col">
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-white/10">
+
+            {/* Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+              className={cn(
+                "absolute right-0 top-0 bottom-0 w-[85%] max-w-sm shadow-2xl flex flex-col",
+                isDark ? "bg-[#0d0d0d]" : "bg-white"
+              )}
+            >
+              {/* Drawer header */}
+              <div
+                className={cn(
+                  "flex items-center justify-between p-6 border-b",
+                  isDark ? "border-white/8" : "border-gray-100"
+                )}
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                     <Eye size={18} className="text-white" />
                   </div>
-                  <span className="font-display font-bold text-lg">
+                  <span
+                    className={cn(
+                      "font-display font-bold text-lg",
+                      isDark ? "text-white" : "text-[#111]"
+                    )}
+                  >
                     Aït Ourir Optique
                   </span>
                 </div>
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                  className={cn(
+                    "p-2 rounded-xl transition-colors",
+                    isDark
+                      ? "text-white hover:bg-white/10"
+                      : "text-[#111] hover:bg-gray-100"
+                  )}
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              {/* Nav Links */}
-              <div className="flex-1 overflow-y-auto py-4">
+              {/* Nav links */}
+              <div className="flex-1 overflow-y-auto py-2">
                 {NAV_ITEMS.map((item, i) => (
                   <motion.div
                     key={item.label}
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: 24 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.07 }}
+                    transition={{ delay: i * 0.06 }}
                   >
                     <button
                       onClick={() => scrollTo(item.href)}
-                      className="w-full text-left px-6 py-4 text-base font-medium hover:text-[#B40000] hover:bg-[#B40000]/5 transition-colors duration-150 border-b border-gray-50 dark:border-white/5"
+                      className={cn(
+                        "w-full text-left px-6 py-4 text-base font-medium transition-colors duration-150 border-b",
+                        isDark
+                          ? "text-white/85 hover:text-white hover:bg-white/5 border-white/5"
+                          : "text-[#111] hover:text-[#B40000] hover:bg-[#B40000]/5 border-gray-50"
+                      )}
                     >
                       {item.label}
                     </button>
@@ -329,7 +407,12 @@ export default function Header() {
               </div>
 
               {/* CTA */}
-              <div className="p-6 space-y-3 border-t border-gray-100 dark:border-white/10">
+              <div
+                className={cn(
+                  "p-6 space-y-3 border-t",
+                  isDark ? "border-white/8" : "border-gray-100"
+                )}
+              >
                 <button
                   onClick={() => scrollTo("#contact")}
                   className="w-full py-4 gradient-primary text-white rounded-2xl font-semibold text-center shadow-red"
@@ -337,8 +420,13 @@ export default function Header() {
                   Prendre rendez-vous
                 </button>
                 <a
-                  href={`tel:${SITE_CONFIG.phone}`}
-                  className="w-full py-3 border border-gray-200 dark:border-white/10 rounded-2xl font-medium text-center flex items-center justify-center gap-2 hover:border-[#B40000] hover:text-[#B40000] transition-colors"
+                  href="tel:+212606708444"
+                  className={cn(
+                    "w-full py-3 rounded-2xl font-medium text-sm text-center flex items-center justify-center gap-2 border transition-colors",
+                    isDark
+                      ? "border-white/15 text-white hover:border-[#B40000] hover:text-[#B40000]"
+                      : "border-gray-200 text-[#111] hover:border-[#B40000] hover:text-[#B40000]"
+                  )}
                 >
                   <Phone size={16} />
                   {SITE_CONFIG.phone}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +15,6 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/data";
-import { useState } from "react";
 
 const schema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -38,6 +37,14 @@ const SERVICES_OPTIONS = [
   "Autre",
 ];
 
+function TikTokIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
+    </svg>
+  );
+}
+
 export default function Contact() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
@@ -48,22 +55,76 @@ export default function Contact() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    getValues,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormData) => {
-    await new Promise((r) => setTimeout(r, 1200));
-    console.log(data);
+    // Build WhatsApp message
+    const msg = [
+      `🔴 *Nouvelle demande — Aït Ourir Optique*`,
+      ``,
+      `👤 *Nom:* ${data.name}`,
+      `📞 *Téléphone:* ${data.phone}`,
+      data.email ? `📧 *Email:* ${data.email}` : "",
+      `🔧 *Service:* ${data.service}`,
+      data.date ? `📅 *Date souhaitée:* ${data.date}` : "",
+      ``,
+      `💬 *Message:*`,
+      data.message,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const encoded = encodeURIComponent(msg);
+    const waUrl = `https://wa.me/${SITE_CONFIG.whatsapp}?text=${encoded}`;
+
+    // Open WhatsApp in new tab
+    window.open(waUrl, "_blank");
+
     setSubmitted(true);
     reset();
-    setTimeout(() => setSubmitted(false), 5000);
+    setTimeout(() => setSubmitted(false), 6000);
   };
 
   const inputClass =
     "w-full px-4 py-3.5 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl text-sm text-[#111] dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#B40000] focus:ring-2 focus:ring-[#B40000]/10 transition-all duration-200";
 
-  const errorClass = "text-[#B40000] text-xs mt-1 flex items-center gap-1";
+  const errorClass = "text-[#B40000] text-xs mt-1";
+
+  const contactItems = [
+    {
+      icon: MapPin,
+      label: "Adresse",
+      value: SITE_CONFIG.address,
+      subValue: SITE_CONFIG.addressFr,
+      color: "#B40000",
+      href: null,
+      dir: "rtl" as const,
+    },
+    {
+      icon: Phone,
+      label: "Téléphone",
+      value: SITE_CONFIG.phone,
+      color: "#B40000",
+      href: `tel:+212606708444`,
+    },
+    {
+      icon: MessageCircle,
+      label: "WhatsApp",
+      value: SITE_CONFIG.phone,
+      color: "#25D366",
+      href: `https://wa.me/${SITE_CONFIG.whatsapp}`,
+    },
+    {
+      icon: Mail,
+      label: "Email",
+      value: SITE_CONFIG.email,
+      color: "#D4AF37",
+      href: `mailto:${SITE_CONFIG.email}`,
+    },
+  ];
 
   return (
     <section
@@ -98,76 +159,61 @@ export default function Contact() {
             transition={{ delay: 0.2 }}
             className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto"
           >
-            Réservez votre consultation ou posez-nous vos questions. Nous vous
-            répondons dans les plus brefs délais.
+            Remplissez le formulaire — votre demande sera envoyée directement
+            sur notre WhatsApp.
           </motion.p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-10">
-          {/* Contact info – left */}
+          {/* Left — info */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-2 space-y-6"
+            className="lg:col-span-2 space-y-4"
           >
-            {/* Info cards */}
-            {[
-              {
-                icon: MapPin,
-                label: "Adresse",
-                value: SITE_CONFIG.address,
-                color: "#B40000",
-                href: null,
-              },
-              {
-                icon: Phone,
-                label: "Téléphone",
-                value: SITE_CONFIG.phone,
-                color: "#B40000",
-                href: `tel:${SITE_CONFIG.phone}`,
-              },
-              {
-                icon: MessageCircle,
-                label: "WhatsApp",
-                value: `wa.me/${SITE_CONFIG.whatsapp}`,
-                color: "#25D366",
-                href: `https://wa.me/${SITE_CONFIG.whatsapp}`,
-              },
-              {
-                icon: Mail,
-                label: "Email",
-                value: SITE_CONFIG.email,
-                color: "#D4AF37",
-                href: `mailto:${SITE_CONFIG.email}`,
-              },
-            ].map((item) => {
+            {contactItems.map((item) => {
               const Icon = item.icon;
-              const content = (
-                <div className="flex items-start gap-4 p-5 bg-white dark:bg-[#141414] rounded-2xl shadow-luxury border border-gray-100 dark:border-white/5 hover:border-[#B40000]/20 transition-colors duration-300 group">
+              const inner = (
+                <div
+                  className="flex items-start gap-4 p-5 bg-white dark:bg-[#141414] rounded-2xl shadow-luxury border border-gray-100 dark:border-white/5 hover:border-[#B40000]/20 transition-colors duration-300 group"
+                >
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
-                    style={{ backgroundColor: `${item.color}12` }}
+                    style={{ backgroundColor: `${item.color}15` }}
                   >
                     <Icon size={20} style={{ color: item.color }} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="text-xs text-gray-400 font-medium mb-0.5">
                       {item.label}
                     </div>
-                    <div className="text-sm text-[#111] dark:text-white font-medium">
+                    <div
+                      className="text-sm text-[#111] dark:text-white font-medium break-words"
+                      dir={item.dir}
+                    >
                       {item.value}
                     </div>
+                    {"subValue" in item && item.subValue && (
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        {item.subValue}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
 
               return item.href ? (
-                <a key={item.label} href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
-                  {content}
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target={item.href.startsWith("http") ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                >
+                  {inner}
                 </a>
               ) : (
-                <div key={item.label}>{content}</div>
+                <div key={item.label}>{inner}</div>
               );
             })}
 
@@ -184,7 +230,7 @@ export default function Contact() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Lun – Ven</span>
-                  <span className="text-[#111] dark:text-white font-medium">
+                  <span className="text-[#111] dark:text-white font-medium text-right">
                     {SITE_CONFIG.hours.weekdays}
                   </span>
                 </div>
@@ -202,9 +248,42 @@ export default function Contact() {
                 </div>
               </div>
             </div>
+
+            {/* Social quick links */}
+            <div className="p-5 bg-white dark:bg-[#141414] rounded-2xl shadow-luxury border border-gray-100 dark:border-white/5">
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-3">
+                Suivez-nous
+              </p>
+              <div className="flex gap-3">
+                <a
+                  href={SITE_CONFIG.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#B40000] hover:text-white text-gray-600 dark:text-gray-400 text-xs font-medium transition-all duration-200"
+                >
+                  Instagram
+                </a>
+                <a
+                  href={SITE_CONFIG.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#1877F2] hover:text-white text-gray-600 dark:text-gray-400 text-xs font-medium transition-all duration-200"
+                >
+                  Facebook
+                </a>
+                <a
+                  href={SITE_CONFIG.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#010101] hover:text-white text-gray-600 dark:text-gray-400 text-xs font-medium transition-all duration-200"
+                >
+                  TikTok
+                </a>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Form – right */}
+          {/* Right — form */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -212,20 +291,35 @@ export default function Contact() {
             className="lg:col-span-3"
           >
             <div className="bg-white dark:bg-[#141414] rounded-3xl p-8 shadow-luxury-lg border border-gray-100 dark:border-white/5">
+              {/* WhatsApp badge */}
+              <div className="flex items-center gap-2.5 mb-6 p-3.5 bg-[#25D366]/8 dark:bg-[#25D366]/10 rounded-2xl border border-[#25D366]/20">
+                <div className="w-8 h-8 bg-[#25D366] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MessageCircle size={16} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#111] dark:text-white">
+                    Envoi direct sur WhatsApp
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Votre demande s&apos;ouvre automatiquement dans WhatsApp
+                  </p>
+                </div>
+              </div>
+
               {submitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center justify-center py-16 text-center"
+                  className="flex flex-col items-center justify-center py-14 text-center"
                 >
-                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
-                    <CheckCircle size={32} className="text-green-500" />
+                  <div className="w-16 h-16 bg-[#25D366]/10 rounded-full flex items-center justify-center mb-4">
+                    <CheckCircle size={32} className="text-[#25D366]" />
                   </div>
                   <h3 className="font-display text-2xl font-bold text-[#111] dark:text-white mb-2">
-                    Message envoyé !
+                    WhatsApp ouvert !
                   </h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    Nous vous répondrons dans les plus brefs délais. À bientôt !
+                  <p className="text-gray-500 dark:text-gray-400 text-sm max-w-xs">
+                    Vérifiez votre WhatsApp et envoyez le message. À très bientôt !
                   </p>
                 </motion.div>
               ) : (
@@ -253,7 +347,7 @@ export default function Contact() {
                       </label>
                       <input
                         {...register("phone")}
-                        placeholder="+212 6 00 00 00 00"
+                        placeholder="06 06 70 84 44"
                         className={inputClass}
                       />
                       {errors.phone && (
@@ -266,7 +360,7 @@ export default function Contact() {
                     {/* Email */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
-                        Email
+                        Email <span className="text-gray-400 normal-case font-normal">(optionnel)</span>
                       </label>
                       <input
                         {...register("email")}
@@ -329,23 +423,23 @@ export default function Contact() {
                     disabled={isSubmitting}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center gap-3 py-4 gradient-primary text-white rounded-2xl font-bold text-base shadow-red hover:opacity-90 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-3 py-4 bg-[#25D366] hover:bg-[#20bc5a] text-white rounded-2xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Envoi en cours...
+                        Ouverture WhatsApp...
                       </>
                     ) : (
                       <>
-                        <Send size={18} />
-                        Envoyer la demande
+                        <MessageCircle size={20} />
+                        Envoyer via WhatsApp
                       </>
                     )}
                   </motion.button>
 
                   <p className="text-center text-xs text-gray-400">
-                    Réponse garantie sous 24h · Consultation gratuite
+                    ✓ Réponse rapide · ✓ Consultation gratuite · ✓ Sans engagement
                   </p>
                 </form>
               )}
@@ -368,7 +462,7 @@ export default function Contact() {
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            title="Centre d'Optique Aït Ourir - Localisation"
+            title="Centre d'Optique Aït Ourir — السوق الجديد العمران"
           />
         </motion.div>
       </div>

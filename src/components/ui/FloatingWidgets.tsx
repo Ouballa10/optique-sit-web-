@@ -53,6 +53,7 @@ export default function FloatingWidgets() {
               className="absolute right-14 top-1/2 -translate-y-1/2 bg-[#111] dark:bg-white text-white dark:text-[#111] text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg"
             >
               {SITE_CONFIG.phone}
+
             </motion.div>
           )}
         </AnimatePresence>
